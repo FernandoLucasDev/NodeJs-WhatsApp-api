@@ -1,0 +1,27 @@
+{
+  "name": "whatsapp-api",
+  "version": "1.0.0",
+  "description": "krona whatsapp's api",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/FernandoLucasDev/WhatsApp-api.git"
+  },
+  "author": "Fernando Lucas",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/FernandoLucasDev/WhatsApp-api/issues"
+  },
+  "homepage": "https://github.com/FernandoLucasDev/WhatsApp-api#readme",
+  "dependencies": {
+    "bcrypt": "^5.1.0",
+    "body-parser": "^1.20.2",
+    "express": "^4.18.2",
+    "mysql": "^2.18.1",
+    "mysql2": "^3.3.5",
+    "nodemon": "^2.0.22"
+  }
+}
