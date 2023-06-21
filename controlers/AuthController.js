@@ -1,5 +1,7 @@
 const bcrypt = require('bcrypt');
 const { create_user, select_user } = require('../model/UsersModel');
+const { genToken, verifyToken } = require('./GenerateJWT');
+const { response } = require('express');
 
 exports.create_user = async (req, res) => {
   try {
@@ -37,6 +39,7 @@ exports.create_user = async (req, res) => {
 
 
 exports.login = async (req, res) => {
+    let response;
 
     const email = req.body.email;
     const pass = req.body.password;
@@ -76,9 +79,13 @@ exports.login = async (req, res) => {
     });
 
     if(correctPass){
+        const token = genToken({
+            email: email,
+            password: pass
+        });
         response = {
             statusCode: 200,
-            message: 'Usuário existente e senha correta'
+            token: token
         };
         res.status(response.statusCode).json(response);
         return response;

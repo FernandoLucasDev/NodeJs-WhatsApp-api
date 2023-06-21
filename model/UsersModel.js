@@ -30,7 +30,7 @@ const connect = async () => {
       }
     } catch (error) {
       console.log('Erro: ' + error);
-      throw error; // Rethrow the error to be caught in the controller
+      throw error;
     }
   };
 
@@ -45,12 +45,14 @@ const connect = async () => {
         const user = result[0];
         const pass = user.pass
         const email = user.email
+        const id = user.id
         return {
             user: true,
             statusCode: 200,
             message: "User encontrado!",
             user: email,
-            pass: pass
+            pass: pass,
+            id: id
         };
       } else {
         return {
@@ -58,8 +60,9 @@ const connect = async () => {
             statusCode: 500,
             message: "User não encontrado!",
             user: null,
-            pass: null
-        };;
+            pass: null,
+            id: null
+        };
       }
     } catch (error) {
       console.log('Erro: ' + error);

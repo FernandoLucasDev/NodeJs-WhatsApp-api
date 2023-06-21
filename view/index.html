@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Julius+Sans+One&family=Roboto:wght@300&display=swap" rel="stylesheet">
+    <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
+    <title>Seu Whatsapp QR Code</title>
+</head>
+<style>
+    * {
+    padding:0;
+    margin:0;
+    vertical-align:baseline;
+    list-style:none;
+    border:0
+    }
+
+    p, h1, h2, h3, h4, h5, h6 {
+        font-family: Arial, Helvetica, sans-serif;
+    }
+
+    body {
+        background-color: #111B21;
+    }
+
+    .header {
+        width: 100%;
+        height: 14rem;
+        background-color: #00A884;
+        color: white;
+    }
+
+    .title {
+        margin-left: 20%;
+        font-family: 'Roboto', sans-serif;
+    }
+
+    .info {
+        background-color: white;
+        width: 60%;
+        height: 36rem;
+        position: fixed;
+        top: 8rem;
+        margin-left: 20%;
+        display: flex;
+        flex-wrap: wrap;
+        padding: 20px;
+        border-radius: 5px;
+    }
+
+    .title-info {
+        font-size: 28px;
+        font-weight: 100;
+        line-height: normal;
+        color: #576772;
+    }
+
+    .text-info {
+        font-size: 18px;
+        font-weight: 50;
+        line-height: normal;
+        color: #8b9da8;
+    }
+
+    .qr {
+        margin-left: 3rem;
+    }
+
+    .loader {
+        border: 8px solid #f3f3f3;
+        border-top: 8px solid #3498db;
+        border-radius: 50%;
+        width: 60px;
+        height: 60px;
+        animation: spin 2s linear infinite;
+        margin: 0 auto;
+        margin-left: 9rem;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+    }
+
+</style>
+<body>
+    <div class="header">
+        <br><br><br><br>
+        <h3 class="title">API do WhatsApp Krona</h3>
+    </div>
+    <div class="info">
+        <div>
+            <p class="title-info">Usuário Krona, logue seu dispositivo no QR code:</p><br><br><br>
+            <p class="text-info">1 - Abra o Whastapp no dispositivo móvel,<br> vá em dispisitivos conectados e adicionar novo dispositivo.</p><br>
+            <p class="text-info">2 - Aguarde a geração do QR code e escanei-o.</p><br>
+            <p class="text-info">3 - As mensagens na fila serão enviadas assim que for logado<br> Não esqueça de realizar o processo de adicionar na fila antes.</p><br>
+        </div>
+        <div>
+            <div>
+                <div class="loader"></div>
+                <div id="qrcode" class="qr"></div>
+            </div>
+        </div>
+    </div>
+    <script>
+        document.querySelector('.loader').style.display = 'block';
+
+        axios.get('http://localhost:3000/whatsapp-login', { timeout: 50000 })
+        .then(response => {
+            let res = response.data;
+            gerarQRCode(res.url);
+        })
+        .catch(error => {
+            console.error(error);
+        });
+
+        function gerarQRCode(url) {
+        var qrcode = new QRCode(document.getElementById("qrcode"), {
+            text: url,
+            width: 210,
+            height: 210,
+        });
+        document.querySelector('.loader').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
