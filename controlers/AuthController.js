@@ -25,7 +25,6 @@ exports.create_user = async (req, res) => {
         email: email,
         pass: hash_pass,
     };
-
     const result = await create_user(user);
     res.status(result.statusCode).json(result);
   } catch (error) {

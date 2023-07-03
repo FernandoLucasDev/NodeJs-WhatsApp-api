@@ -1,4 +1,4 @@
-const { create_message, get_messages } = require('../model/MessagesModel');
+const { create_message, get_messages, get_history } = require('../model/MessagesModel');
 const { genToken, verifyToken } = require('./GenerateJWT');
 
 exports.CreateMessage = async (req, res, next) => {
@@ -30,4 +30,23 @@ exports.CreateMessage = async (req, res, next) => {
       throw error;
     }
 };
-  
+
+exports.RowList = async (req, res) => {
+    try{
+      const response = await get_messages();
+      return res.status(200).json({ data: response });
+    } catch(error) {
+      console.log('Erro: ' + error);
+      throw error;
+    }
+}
+
+exports.HistoryList = async (req, res) => {
+  try{
+    const response = await get_history();
+    return res.status(200).json({ data: response });
+  } catch(error) {
+    console.log('Erro: ' + error);
+    throw error;
+  }
+}

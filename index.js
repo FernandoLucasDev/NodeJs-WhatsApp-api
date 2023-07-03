@@ -1,5 +1,5 @@
 const { create_user, login } = require('./controlers/AuthController');
-const { CreateMessage } = require('./controlers/MessageContolller');
+const { CreateMessage, RowList, HistoryList } = require('./controlers/MessageContolller');
 const { SendRow, Auth } = require('./controlers/SendRow');
 const bodyParser = require('body-parser');
 const path = require('path');
@@ -22,7 +22,9 @@ app.post('/whatsapp-create', CreateMessage);
 
 app.get('/whatsapp-login', Auth)
 app.get('/send-messages', SendRow);
+app.get('/row-list', RowList);
+app.get('/history-list', HistoryList);
 
-app.listen(3000, () => {
-  console.log('Servidor iniciado na porta 3000');
+app.listen(3600, () => {
+  console.log('Servidor iniciado na porta 3600');
 });

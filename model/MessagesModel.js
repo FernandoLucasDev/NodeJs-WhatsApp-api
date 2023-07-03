@@ -70,4 +70,15 @@ const create_history = async (info) => {
   }
 };
 
-module.exports = {create_message, get_messages, delete_message, create_history}
+const get_history = async () => {
+  try{
+      const con = await connect();
+      const [linha] = await con.query('SELECT * FROM message_history ORDER BY data_hora DESC');
+      return await linha;
+  } catch(error) {
+      console.log('Erro: ' + error);
+      throw error;
+  }
+};
+
+module.exports = {create_message, get_messages, delete_message, create_history, get_history}

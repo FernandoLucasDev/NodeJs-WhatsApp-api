@@ -71,7 +71,8 @@ exports.consumeRow = async (messages_row) => {
     size = Object.keys(messages_row).length;
     for (const element of messages_row) {
       try {
-        const phone = element.destino + '@c.us';
+        const phone = element.destino.slice(0,4) + element.destino.slice(5) + '@c.us';
+        console.log(phone)
         await client.sendMessage(phone, element.texto);
         await create_history({
           to: element.destino,
