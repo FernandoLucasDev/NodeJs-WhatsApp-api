@@ -1,3 +1,5 @@
+const {create_error} = require('../model/ErrorModel');
+
 const connect = async () => {
     if (global.connection && global.connection.state !== 'disconnected') {
       return global.connection;
@@ -29,8 +31,7 @@ const create_message = async (msg) => {
         };
       }
     } catch (error) {
-      console.log('Erro: ' + error);
-      throw error;
+      create_error(error);
     }
 };
 
@@ -40,8 +41,7 @@ const get_messages = async () => {
         const [linha] = await con.query('SELECT * FROM message_row ORDER BY id DESC');
         return await linha;
     } catch(error) {
-        console.log('Erro: ' + error);
-        throw error;
+       create_error(error);
     }
 };
 
@@ -52,8 +52,7 @@ const delete_message = async (msg) => {
     const values = [msg.id];
     await con.query(sql, values);
   } catch (error) {
-    console.log('Erro: ' + error);
-    throw error;
+    create_error(error);
   }
 };
 
@@ -65,8 +64,7 @@ const create_history = async (info) => {
     const values = [info.to, info.content, datahora];
     await con.query(sql, values);
   } catch (error) {
-    console.log('Erro: ' + error);
-    throw error;
+    create_error(error);
   }
 };
 
@@ -76,8 +74,7 @@ const get_history = async () => {
       const [linha] = await con.query('SELECT * FROM message_history ORDER BY data_hora DESC');
       return await linha;
   } catch(error) {
-      console.log('Erro: ' + error);
-      throw error;
+      create_error(error);
   }
 };
 

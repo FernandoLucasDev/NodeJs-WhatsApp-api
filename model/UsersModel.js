@@ -1,3 +1,5 @@
+const {create_error} = require('../model/ErrorModel');
+
 const connect = async () => {
     if (global.connection && global.connection.state !== 'disconnected') {
       return global.connection;
@@ -13,8 +15,8 @@ const connect = async () => {
   const create_user = async (user) => {
     try {
       const con = await connect();
-      const sql = 'INSERT INTO users (nome, email, pass) VALUES (?, ?, ?)';
-      const values = [user.name, user.email, user.pass];
+      const sql = 'INSERT INTO users (nome, email, pass, active_user) VALUES (?, ?, ?, ?)';
+      const values = [user.name, user.email, user.pass, false];
       const [result] = await con.query(sql, values);
   
       if (result.affectedRows === 1) {
@@ -29,8 +31,8 @@ const connect = async () => {
         };
       }
     } catch (error) {
-      console.log('Erro: ' + error);
-      throw error;
+      console.log('caiu no erro');
+      create_error(error);
     }
   };
 
@@ -65,10 +67,90 @@ const connect = async () => {
         };
       }
     } catch (error) {
-      console.log('Erro: ' + error);
-      throw error; 
+      create_error(error); 
+    }
+  };
+
+  const unctivate_user = async (user) => {
+    try {
+      const con = await connect();
+      const sql = 'UPDATE users set active_user = false where email = (?) limit 1';
+      const values = [user.email];
+      const [result] = await con.query(sql, values);
+      console.log(result);
+       if(result.length === 1) {
+        return {
+          statusCode: 200,
+          msg: "atualizado!"
+        }
+       } else {
+        return {
+          statusCode: 500,
+          msg: "Não atualizado - desativar"
+        }
+       }
+    } catch(error) {
+      create_error(error);
+    }
+  }
+
+  const user_activate = async (user) => {
+    try {
+      const con = await connect();
+      const sql = 'UPDATE users set active_user = true where email = (?) limit 1';
+      const values = [user.email];
+      console.log("--->" + user.email);
+      const [result] = await con.query(sql, values);
+      console.log(result);
+       if(result.length === 1) {
+        return {
+          statusCode: 200,
+          msg: "atualizado 2!"
+        }
+       } else {
+        return {
+          statusCode: 500,
+          msg: "não atualizado! - ativar"
+        }
+       }
+    } catch(error) {
+      create_error(error);
+    }
+  };
+
+  const user_delete = async (user) => {
+    try {
+      const con = await connect();
+      const sql = 'DELETE FROM users WHERE email = (?) LIMIT 1';
+      const values = [user.email];
+      const [result] = await con.query(sql, values);
+  
+      if (result.length === 1) {
+        const user = result[0];
+        const pass = user.pass
+        const email = user.email
+        const id = user.id
+        return {
+            user: true,
+            statusCode: 200,
+            message: "User deletado!",
+            user: email,
+            pass: pass,
+            id: id
+        };
+      } else {
+        return {
+            user: false,
+            statusCode: 500,
+            message: "User não encontrado!",
+            user: null,
+            pass: null,
+            id: null
+        };
+      }
+    } catch (error) {
+      create_error(error); 
     }
   };
   
-  module.exports = { create_user, select_user };
-  
+  module.exports = { create_user, select_user, unctivate_user, user_activate, user_delete };

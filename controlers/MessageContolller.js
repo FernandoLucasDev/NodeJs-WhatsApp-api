@@ -1,13 +1,12 @@
 const { create_message, get_messages, get_history } = require('../model/MessagesModel');
 const { genToken, verifyToken } = require('./GenerateJWT');
+const {create_error} = require('../model/ErrorModel');
 
 exports.CreateMessage = async (req, res, next) => {
     try {
       const token = req.headers['authorization'];
       const to = req.body.to;
       const content = req.body.content;
-
-      console.log(token);
   
       verifyToken(token, async (statusCode) => {
         if (statusCode === 200) {
@@ -26,8 +25,7 @@ exports.CreateMessage = async (req, res, next) => {
         }
       });
     } catch (error) {
-      console.log('Erro: ' + error);
-      throw error;
+      create_error(error);
     }
 };
 
@@ -36,8 +34,7 @@ exports.RowList = async (req, res) => {
       const response = await get_messages();
       return res.status(200).json({ data: response });
     } catch(error) {
-      console.log('Erro: ' + error);
-      throw error;
+      create_error(error);
     }
 }
 
@@ -46,7 +43,6 @@ exports.HistoryList = async (req, res) => {
     const response = await get_history();
     return res.status(200).json({ data: response });
   } catch(error) {
-    console.log('Erro: ' + error);
-    throw error;
+    create_error(error);
   }
 }

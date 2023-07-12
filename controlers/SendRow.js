@@ -1,11 +1,13 @@
 const Send = require('./SendController');
 const { get_messages } = require('../model/MessagesModel');
+const { create_error } = require('../model/ErrorModel');
 
 exports.Auth = async (req, res) => {
   try {
     const response = await Send.AuthWhastapp();
     res.status(200).json(response);
   } catch (error) {
+    create_error(error);
     res.status(500).json({ error: 'Erro ao autenticar no WhatsApp' });
   }
 };
@@ -28,6 +30,6 @@ exports.SendRow = async (req, res) => {
       });
     }
   } catch (error) {
-    console.error('Erro ao enviar mensagens:', error);
+    create_error(error);
   }
 };
