@@ -6,7 +6,7 @@ const connect = async () => {
     }
   
     const mysql = require('mysql2/promise');
-    const con = await mysql.createConnection('mysql://root:root@localhost:3306/whatsapp_api');
+    const con = await mysql.createConnection('mysql://root:@localhost:3306/whatsapp_api');
     console.log('Connected to database');
     global.connection = con;
     return con;
@@ -60,8 +60,8 @@ const create_history = async (info) => {
   try {
     const datahora = new Date().toISOString().slice(0, 19).replace('T', ' ');
     const con = await connect();
-    const sql = 'INSERT INTO message_history (destino, texto, data_hora) VALUES (?, ?, ?)';
-    const values = [info.to, info.content, datahora];
+    const sql = 'INSERT INTO message_history (destino, texto, data_hora, accepted) VALUES (?, ?, ?, ?)';
+    const values = [info.to, info.content, datahora, info.accepted];
     await con.query(sql, values);
   } catch (error) {
     create_error(error);
