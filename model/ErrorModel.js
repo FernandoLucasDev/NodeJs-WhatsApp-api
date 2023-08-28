@@ -1,10 +1,13 @@
+require('dotenv').config();
+
 const connect = async () => {
+  let connStr = process.env.STRING_CONNECTION; 
     if (global.connection && global.connection.state !== 'disconnected') {
       return global.connection;
     }
   
     const mysql = require('mysql2/promise');
-    const con = await mysql.createConnection('mysql://root:root@localhost:3306/whatsapp_api');
+    const con = await mysql.createConnection(connStr);
     console.log('Connected to database');
     global.connection = con;
     return con;
