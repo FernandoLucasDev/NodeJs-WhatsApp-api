@@ -1,12 +1,14 @@
+require('dotenv').config();
 const {create_error} = require('../model/ErrorModel');
 
 const connect = async () => {
+    let connStr = process.env.STRING_CONNECTION; 
     if (global.connection && global.connection.state !== 'disconnected') {
       return global.connection;
     }
   
     const mysql = require('mysql2/promise');
-    const con = await mysql.createConnection('mysql://root:root@localhost:3306/whatsapp_api');
+    const con = await mysql.createConnection(connStr);
     console.log('Connected to database');
     global.connection = con;
     return con;
@@ -14,20 +16,28 @@ const connect = async () => {
   
   const create_user = async (user) => {
     try {
-      const con = await connect();
-      const sql = 'INSERT INTO users (nome, email, pass, active_user) VALUES (?, ?, ?, ?)';
-      const values = [user.name, user.email, user.pass, false];
-      const [result] = await con.query(sql, values);
-  
-      if (result.affectedRows === 1) {
-        return {
-          statusCode: 201,
-          message: 'Usuário criado com sucesso!',
-        };
+      let hasUser = await select_user({email:user.email});
+      if(!hasUser.user) {
+        const con = await connect();
+        const sql = 'INSERT INTO users (nome, email, pass, active_user) VALUES (?, ?, ?, ?)';
+        const values = [user.name, user.email, user.pass, false];
+        const [result] = await con.query(sql, values);
+    
+        if (result.affectedRows === 1) {
+          return {
+            statusCode: 201,
+            message: 'Usuário criado com sucesso!',
+          };
+        } else {
+          return {
+            statusCode: 500,
+            message: 'Falha na criação de usuário',
+          };
+        }
       } else {
         return {
-          statusCode: 500,
-          message: 'Falha na criação de usuário',
+          statusCode: 409,
+          message: 'Crendenciais já estão em uso.',
         };
       }
     } catch (error) {
@@ -67,6 +77,7 @@ const connect = async () => {
         };
       }
     } catch (error) {
+      console.log(error);
       create_error(error); 
     }
   };
