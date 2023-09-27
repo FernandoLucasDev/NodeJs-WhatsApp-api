@@ -1,6 +1,7 @@
 const { create_user, login, user_unactivate, user_activate, user_delete } = require('./controlers/AuthController');
 const { CreateMessage, RowList, HistoryList } = require('./controlers/MessageContolller');
 const { SendRow, Auth } = require('./controlers/SendRow');
+const { getStatus } = require('./controlers/SendController')
 const bodyParser = require('body-parser');
 const path = require('path');
 
@@ -27,6 +28,7 @@ app.get('/whatsapp-login', Auth)
 app.get('/send-messages', SendRow);
 app.get('/row-list', RowList);
 app.get('/history-list', HistoryList);
+app.get('/status-session', getStatus);
 
 app.listen(3600, () => {
   console.log('Servidor iniciado na porta 3600');
