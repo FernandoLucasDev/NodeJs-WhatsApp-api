@@ -25,11 +25,14 @@
     "express": "^4.18.2",
     "fs": "^0.0.1-security",
     "jsonwebtoken": "^9.0.0",
+    "mongoose": "^7.5.2",
     "mysql": "^2.18.1",
     "mysql2": "^3.3.5",
     "nodemon": "^2.0.22",
     "path": "^0.12.7",
+    "puppeteer": "^21.3.1",
     "qrcode-terminal": "^0.12.0",
-    "whatsapp-web.js": "^1.21.0"
+    "whatsapp-web.js": "github:pedroslopez/whatsapp-web.js#152f0a64cdffdfb4d638043f537f87b2a6ebc492",
+    "wwebjs-mongo": "^1.1.0"
   }
 }
