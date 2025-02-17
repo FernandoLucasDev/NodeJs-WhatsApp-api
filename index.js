@@ -23,13 +23,11 @@ app.post('/user-unactivate', user_unactivate);
 app.post('/user-activate', user_activate);
 app.post('/whatsapp-create', CreateMessage);
 app.post('/delete-user', user_delete);
-
 app.get('/whatsapp-login', Auth)
 app.get('/send-messages', SendRow);
 app.get('/row-list', RowList);
 app.get('/history-list', HistoryList);
-app.get('/status-session', getStatus);
 
-app.listen(3600, () => {
-  console.log('Servidor iniciado na porta 3600');
+app.listen(3610, () => {
+  console.log('Servidor iniciado na porta 3610');
 });

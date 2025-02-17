@@ -115,7 +115,7 @@
     <script>
         document.querySelector('.loader').style.display = 'block';
 
-        axios.get('http://localhost:3600/whatsapp-login', { timeout: 50000 })
+        axios.get('http://localhost:3610/whatsapp-login', { timeout: 50000 })
         .then(response => {
             let res = response.data;
             gerarQRCode(res.url);

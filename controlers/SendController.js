@@ -1,122 +1,95 @@
-const { resolve } = require('path');
+const { get } = require('mongoose');
+const { Client, LocalAuth } = require('whatsapp-web.js');
 const { delete_message, create_history } = require('../model/MessagesModel');
-const { create_session } = require('../model/SessionsModel');
-const { Client, RemoteAuth, LocalAuth} = require('whatsapp-web.js');
 
-let sessionOwner = "nando";
+let sessionOwner = "krona";
+let authenticated = false;
 
 const client = new Client({
+  puppeteer: {
+    headless: true,
+    args: ['--no-sandbox', '--disable-setuid-sandbox'],
+  },
   authStrategy: new LocalAuth({
     clientId: sessionOwner
   })
 });
 
-let authenticated = false;
-let sessionData = null;
 
+// Função para autenticar o cliente
 exports.AuthWhastapp = async () => {
-  client.initialize();
-  return new Promise((resolve) => {
-    client.on('qr', qr => {
-      const response = { url: qr };
-      resolve(response);
-    });
 
-    client.on('ready', () => {
-      console.log('cliente pronto')
-      authenticated = true;
-      resolve();
-    });
-
-    client.on('authenticated', async (session) => {
-      console.log('Authenticated!');
-    });
-
-  });
-};
-
-exports.consumeRow = async (messages_row) => {
-  let count;
-
-  if (authenticated == false) {
+  try {
+    if(authenticated){
+      return { message: 'Cliente já autenticado!', status: 1 };
+    }
     client.initialize();
-    count = await new Promise((resolve) => {
-      client.on('ready', async () => {
-        console.log('cliente pronto');
+    return new Promise((resolve, reject) => {
+      
+      client.on('qr', (qr) => {
+        resolve({ url: qr, status: 0 });
+      });
+  
+      client.on('authenticated', () => {
         authenticated = true;
-        const totalCount = await sendMessageRow(messages_row);
-        resolve(totalCount);
+        resolve({ message: 'Cliente autenticado com sucesso!', status: 1 });
+      });
+  
+      client.on('auth_failure', (msg) => {
+        reject({ message: 'Falha na autenticação', status: 2 });
+      });
+  
+      client.on('disconnected', (reason) => {
+        reject({ message: 'Cliente desconectado: ' + reason, status: 2 });
       });
     });
-  } else {
-    count = await sendMessageRow(messages_row);
+  } catch (error) {
+    return Promise.reject({ message: 'Erro ao inicializar o cliente', error, status: 500 });
   }
 
-  return count;
+   
 };
 
+// Função para consumir mensagens e enviá-las
+exports.consumeRow = async (messages_row) => {
+  try {
+    if (!authenticated) {
+      console.log('Cliente não autenticado. Inicializando...');
+      await client.initialize();
+    }
+
+    const count = await sendMessageRow(messages_row);
+    return count;
+  } catch (error) {
+    console.error('Erro no consumeRow:', error);
+    throw error;
+  }
+};
+
+// Função para enviar mensagens
 const sendMessageRow = async (messages_row) => {
   let count = 0;
 
-  if (messages_row.length !== 0) {
-    const promises = [];
-
-    for (const element of messages_row) {
-      promises.push(
-        (async () => {
-          try {
-            let phone = element.destino + '@c.us';
-            console.log(phone);
-            const exists = await client.isRegisteredUser(phone);
-            if (exists) {
-              var formattedPhone = await client.getNumberId(phone);
-              console.log(formattedPhone);
-              await client.sendMessage(formattedPhone.user + '@c.us', element.texto);
-              await create_history({
-                to: element.destino,
-                content: element.texto,
-                accepted: true
-              });
-              await delete_message({ id: element.id });
-            } else {
-              await create_history({
-                to: element.destino,
-                content: element.texto,
-                accepted: false
-              });
-              await delete_message({ id: element.id });
-            }
-          } catch (error) {
-            console.error('Erro ao enviar mensagem:', error);
-          }
-          count++;
-        })()
-      );
-    }
-    await Promise.all(promises);
+  if (messages_row.length > 0) {
+    await Promise.all(messages_row.map(async (element) => {
+      try {
+        const phone = element.destino + '@c.us';
+        const exists = await client.isRegisteredUser(phone);
+        if (exists) {
+          const formattedPhone = await client.getNumberId(phone);
+          await client.sendMessage(formattedPhone.user + '@c.us', element.texto);
+          await create_history({ to: element.destino, content: element.texto, accepted: true });
+        } else {
+          await create_history({ to: element.destino, content: element.texto, accepted: false });
+        }
+        await delete_message({ id: element.id });
+        count++;
+      } catch (error) {
+        console.error('Erro ao enviar mensagem:', error);
+      }
+    }));
   }
-  
+
   return count;
 };
 
-exports.getStatus = async (req, res) => {
-  client.initialize();
-  
-  const promise = new Promise((resolve) => {
-    client.on('ready', () => {
-      console.log('cliente pronto');
-      resolve(true);
-    });
-  });
-
-  const hasSession = await promise;
-
-  if (hasSession) {
-    return res.status(200).json({ message: 'Usuário logado: ' + sessionOwner });
-  } else {
-    return res.status(401).json({ message: 'Usuário não logado' });
-  }
-}
-
-
-        

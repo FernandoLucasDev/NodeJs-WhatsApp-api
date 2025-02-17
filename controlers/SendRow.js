@@ -14,9 +14,10 @@ exports.Auth = async (req, res) => {
 
 exports.SendRow = async (req, res) => {
   const hora = new Date().toLocaleTimeString('pt-BR', { hour12: false });
-  try {
+ try {
     const response = await get_messages();
-    const qnt = await Send.consumeRow(response);
+    const qnt = await Send.consumeRow(response); // erro aqui
+    //res.status(200).send(qnt);
     if(qnt === 0 || qnt == null){
       res.status(201).json({
         mensagem: 'Sem mensagens na fila!',
@@ -28,8 +29,8 @@ exports.SendRow = async (req, res) => {
         quantidade: qnt,
         hora: hora
       });
-    }
+    } 
   } catch (error) {
     create_error(error);
-  }
-};
+  } 
+}; 
